@@ -1,0 +1,27 @@
+{
+  "name": "voltino-bot",
+  "version": "1.0.0",
+  "description": "Daily Voltino Menu to Telegram",
+  "main": "index.js",
+  "scripts": {
+    "start": "node -r dotenv/config src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nautha/voltino-bot.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nautha/voltino-bot/issues"
+  },
+  "homepage": "https://github.com/Nautha/voltino-bot#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.0.0",
+    "file-system": "^2.2.2",
+    "table-scraper": "^0.1.0",
+    "telegraf": "^3.24.0"
+  }
+}
