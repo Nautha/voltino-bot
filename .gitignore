@@ -7,3 +7,4 @@ config/config.js
 .idea
 .env
 users.json
+package-lock.json
