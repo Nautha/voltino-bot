@@ -1,10 +1,9 @@
 const Telegraf = require('telegraf');
 const fs = require('fs');
-// const {Scrapper} = require('./Scrapper');
 const scraper = require('table-scraper');
+const CronJob = require('cron').CronJob;
 
 const app = new Telegraf(process.env.BOT_TOKEN);
-// const scrapper = new Scrapper();
 
 
 app.telegram.getMe().then((botInfo) => {
@@ -31,12 +30,6 @@ app.command('stop', ctx => {
     ctx.reply('Du bekommst nun keine täglichen Updates mehr. Um sie wieder zu abbonieren, schreibe /start');
 });
 
-app.command('send', ctx => {
-    console.log('send', ctx.chat);
-    sendPlan();
-    app.telegram.sendMessage(ctx.chat.id, 'requested');
-});
-
 app.startPolling();
 
 function sendPlan() {
@@ -49,7 +42,7 @@ function sendPlan() {
     const result = scraper
         .get('https://www.voltino.hn/voltino/wochenkarte')
         .then((body) => {
-            const menu = formatPlan(body[0]);
+            const menu = formatPlan(body[0], day - 1, date);
 
             for (let user in users) {
                 if (!users.hasOwnProperty(user)) {
@@ -63,40 +56,33 @@ function sendPlan() {
         })
 }
 
-function sendToAll() {
+function formatPlan(body, day, date) {
 
-}
+    const daysFullName = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 
-function sendToUser() {
+    const dateString = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 
-}
-
-function formatPlan(body) {
-
-    console.log(body[0]);
-
-    let content = '';
+    let content = `Menü für ${daysFullName[day]} den ${dateString}\n\n`;
 
     let counter = 0;
 
-    Object.keys(body[0]).map(function (objectKey, index) {
-        let value = body[0][objectKey];
+    Object.keys(body[day]).map(function (objectKey, index) {
+        let value = body[day][objectKey];
 
         let price = objectKey.split('_')[0];
 
         let item = value;
 
-        item = item.split(',')[0];  //removes the additives from string end except for the first one
-
-        let itemArray = item.split(' ');
-        item = '';
-        for(let i = 1; i < itemArray.length; i++) {
-            item += itemArray[i - 1] + ' ';
+        if (counter !== 0) {
+            content += `${price} ${item} \n`;
         }
 
-        content += `${price} ${item} \n`;
 
         counter++;
+
+        if (counter < 4) {
+            content += '\n';
+        }
 
         if (counter === 4) {
             content += "\nBeilagen:\n"
@@ -109,3 +95,5 @@ function formatPlan(body) {
     console.log(content);
     return content;
 }
+
+new CronJob('00 00 11 * * 1-5', sendPlan).start();
