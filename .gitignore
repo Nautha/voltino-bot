@@ -6,3 +6,4 @@ coverage
 config/config.js
 .idea
 .env
+users.json
